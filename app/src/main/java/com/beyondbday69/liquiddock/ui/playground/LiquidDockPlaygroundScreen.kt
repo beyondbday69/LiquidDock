@@ -79,7 +79,6 @@ fun LiquidDockPlaygroundScreen(
         ) {
             BackgroundCanvas(
                 config = config,
-                backdrop = backdrop,
                 contentPadding = PaddingValues(top = 80.dp, bottom = 120.dp),
             )
         }
