@@ -22,7 +22,10 @@ android {
 
     signingConfigs {
         create("release") {
-            initWith(signingConfigs.getByName("debug"))
+            storeFile = file("release.keystore")
+            storePassword = "liquiddockpass"
+            keyAlias = "liquiddock"
+            keyPassword = "liquiddockpass"
         }
     }
 
@@ -37,7 +40,7 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
