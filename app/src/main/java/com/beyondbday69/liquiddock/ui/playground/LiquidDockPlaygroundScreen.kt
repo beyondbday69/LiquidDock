@@ -368,6 +368,7 @@ private fun InspectorPanel(
                 title = "Blur Radius: ${config.blurRadiusDp.toInt()} dp",
                 value = config.blurRadiusDp,
                 range = 0f..32f,
+                backdrop = backdrop,
                 isDarkTheme = config.isDarkTheme,
                 onValueChange = { onConfigChange(config.copy(blurRadiusDp = it)) }
             )
@@ -377,6 +378,7 @@ private fun InspectorPanel(
                 title = "Lens Height / Refraction: ${config.lensHeightDp.toInt()} dp",
                 value = config.lensHeightDp,
                 range = 0f..28f,
+                backdrop = backdrop,
                 isDarkTheme = config.isDarkTheme,
                 onValueChange = { onConfigChange(config.copy(lensHeightDp = it)) }
             )
@@ -386,6 +388,7 @@ private fun InspectorPanel(
                 title = "Specular Highlight: ${(config.highlightAlpha * 100).toInt()}%",
                 value = config.highlightAlpha,
                 range = 0f..1f,
+                backdrop = backdrop,
                 isDarkTheme = config.isDarkTheme,
                 onValueChange = { onConfigChange(config.copy(highlightAlpha = it)) }
             )
@@ -422,6 +425,7 @@ private fun SliderSection(
     title: String,
     value: Float,
     range: ClosedFloatingPointRange<Float>,
+    backdrop: LayerBackdrop,
     isDarkTheme: Boolean,
     onValueChange: (Float) -> Unit,
 ) {
@@ -436,8 +440,9 @@ private fun SliderSection(
             value = value,
             onValueChange = onValueChange,
             valueRange = range,
+            backdrop = backdrop,
             isDarkTheme = isDarkTheme,
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
         )
     }
 }
