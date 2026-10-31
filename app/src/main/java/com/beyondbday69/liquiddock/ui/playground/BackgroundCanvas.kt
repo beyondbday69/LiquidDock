@@ -13,10 +13,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,12 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +34,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.beyondbday69.liquiddock.ui.components.GlassCard
+import com.beyondbday69.liquiddock.ui.components.GlassIcon
+import com.beyondbday69.liquiddock.ui.components.GlassIconButton
+import com.beyondbday69.liquiddock.ui.components.GlassText
 import com.beyondbday69.liquiddock.ui.dock.BackgroundPreset
 import com.beyondbday69.liquiddock.ui.dock.DockConfig
 import kotlin.math.cos
@@ -101,34 +98,28 @@ fun BackgroundCanvas(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 12.dp)
                 ) {
-                    Text(
+                    GlassText(
                         text = "Liquid Glass Dockbar",
-                        style = MaterialTheme.typography.headlineMedium,
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (config.isDarkTheme) Color.White else Color(0xFF1A1C1E)
                     )
-                    Text(
+                    GlassText(
                         text = "Scroll items to watch real-time glass refraction & blur over moving content.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (config.isDarkTheme) Color.White.copy(0.70f) else Color(0xFF44474E)
+                        fontSize = 14.sp,
+                        color = if (config.isDarkTheme) Color.White.copy(0.70f) else Color(0xFF44474E),
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
 
-            itemsIndexed(SampleCards) { index, item ->
-                Card(
+            itemsIndexed(SampleCards) { _, item ->
+                GlassCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (config.isDarkTheme) {
-                            Color(0xFF1E2128).copy(alpha = 0.85f)
-                        } else {
-                            Color.White.copy(alpha = 0.90f)
-                        }
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    isDarkTheme = config.isDarkTheme,
                 ) {
                     Row(
                         modifier = Modifier
@@ -143,7 +134,7 @@ fun BackgroundCanvas(
                                 .background(item.color),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Icon(
+                            GlassIcon(
                                 imageVector = Icons.Filled.Album,
                                 contentDescription = null,
                                 tint = Color.White,
@@ -156,40 +147,39 @@ fun BackgroundCanvas(
                                 .weight(1f)
                                 .padding(horizontal = 14.dp)
                         ) {
-                            Text(
+                            GlassText(
                                 text = item.title,
-                                style = MaterialTheme.typography.titleMedium,
+                                fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (config.isDarkTheme) Color.White else Color(0xFF1A1C1E)
                             )
-                            Text(
+                            GlassText(
                                 text = item.subtitle,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (config.isDarkTheme) Color.White.copy(0.65f) else Color(0xFF6B7280)
+                                fontSize = 13.sp,
+                                color = if (config.isDarkTheme) Color.White.copy(0.65f) else Color(0xFF6B7280),
+                                modifier = Modifier.padding(top = 2.dp)
                             )
                         }
 
-                        IconButton(onClick = {}) {
-                            Icon(
+                        GlassIconButton(onClick = {}) {
+                            GlassIcon(
                                 imageVector = Icons.Filled.Favorite,
                                 contentDescription = null,
-                                tint = item.color.copy(alpha = 0.85f)
+                                tint = item.color.copy(alpha = 0.85f),
+                                modifier = Modifier.size(22.dp)
                             )
                         }
 
-                        IconButton(onClick = {}) {
-                            Icon(
+                        GlassIconButton(onClick = {}) {
+                            GlassIcon(
                                 imageVector = Icons.Filled.PlayArrow,
                                 contentDescription = null,
-                                tint = if (config.isDarkTheme) Color.White else Color.Black
+                                tint = if (config.isDarkTheme) Color.White else Color.Black,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
                 }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(110.dp))
             }
         }
     }
@@ -197,58 +187,75 @@ fun BackgroundCanvas(
 
 @Composable
 private fun AnimatedMeshGradient() {
-    val infiniteTransition = rememberInfiniteTransition(label = "mesh")
-    val phase by infiniteTransition.animateFloat(
+    val transition = rememberInfiniteTransition(label = "meshAnim")
+    val phase1 by transition.animateFloat(
         initialValue = 0f,
-        targetValue = 6.2831855f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 12000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "phase",
+        targetValue = 6.28318f,
+        animationSpec = infiniteRepeatable(tween(14000, easing = LinearEasing), RepeatMode.Restart),
+        label = "phase1"
+    )
+    val phase2 by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 6.28318f,
+        animationSpec = infiniteRepeatable(tween(18000, easing = LinearEasing), RepeatMode.Restart),
+        label = "phase2"
     )
 
     Canvas(modifier = Modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
 
-        val x1 = w * (0.3f + 0.2f * sin(phase))
-        val y1 = h * (0.3f + 0.2f * cos(phase))
-        val x2 = w * (0.7f + 0.2f * cos(phase * 0.8f))
-        val y2 = h * (0.7f + 0.2f * sin(phase * 0.8f))
-        val x3 = w * (0.5f + 0.3f * sin(phase * 1.2f))
-        val y3 = h * (0.85f + 0.1f * cos(phase * 1.2f))
+        // Deep vibrant mesh background
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0xFF0F0C29),
+                    Color(0xFF302B63),
+                    Color(0xFF24243E),
+                )
+            )
+        )
 
-        drawRect(Color(0xFF0F141C))
-
+        val center1 = Offset(
+            w * 0.3f + cos(phase1.toDouble()).toFloat() * (w * 0.25f),
+            h * 0.25f + sin(phase1.toDouble()).toFloat() * (h * 0.15f)
+        )
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(Color(0xFF8A2387).copy(alpha = 0.75f), Color.Transparent),
-                center = Offset(x1, y1),
-                radius = w * 0.65f
+                colors = listOf(Color(0xFFFF2A6D).copy(alpha = 0.65f), Color.Transparent),
+                center = center1,
+                radius = w * 0.65f,
             ),
-            center = Offset(x1, y1),
+            center = center1,
             radius = w * 0.65f
         )
 
+        val center2 = Offset(
+            w * 0.7f + sin(phase2.toDouble()).toFloat() * (w * 0.25f),
+            h * 0.65f + cos(phase2.toDouble()).toFloat() * (h * 0.2f)
+        )
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(Color(0xFFE94057).copy(alpha = 0.70f), Color.Transparent),
-                center = Offset(x2, y2),
-                radius = w * 0.60f
+                colors = listOf(Color(0xFF05D9E8).copy(alpha = 0.60f), Color.Transparent),
+                center = center2,
+                radius = w * 0.7f,
             ),
-            center = Offset(x2, y2),
-            radius = w * 0.60f
+            center = center2,
+            radius = w * 0.7f
         )
 
+        val center3 = Offset(
+            w * 0.5f - cos((phase1 + phase2).toDouble() * 0.5).toFloat() * (w * 0.2f),
+            h * 0.85f - sin((phase1 + phase2).toDouble() * 0.5).toFloat() * (h * 0.15f)
+        )
         drawCircle(
             brush = Brush.radialGradient(
-                colors = listOf(Color(0xFFF27121).copy(alpha = 0.65f), Color.Transparent),
-                center = Offset(x3, y3),
-                radius = w * 0.70f
+                colors = listOf(Color(0xFF7B2CBF).copy(alpha = 0.70f), Color.Transparent),
+                center = center3,
+                radius = w * 0.6f,
             ),
-            center = Offset(x3, y3),
-            radius = w * 0.70f
+            center = center3,
+            radius = w * 0.6f
         )
     }
 }
@@ -256,29 +263,39 @@ private fun AnimatedMeshGradient() {
 @Composable
 private fun ColorGridBackdrop() {
     Canvas(modifier = Modifier.fillMaxSize()) {
-        val colors = listOf(
-            Color(0xFF1E3C72),
-            Color(0xFF2A5298),
-            Color(0xFF7B1FA2),
-            Color(0xFF303F9F),
-        )
         drawRect(
-            brush = Brush.verticalGradient(colors)
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    Color(0xFF141E30),
+                    Color(0xFF243B55),
+                    Color(0xFF141E30),
+                )
+            )
         )
     }
 }
 
 @Composable
 private fun NeonFlowBackdrop() {
+    val transition = rememberInfiniteTransition(label = "neonAnim")
+    val sweepOffset by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(tween(10000, easing = LinearEasing), RepeatMode.Reverse),
+        label = "sweep"
+    )
+
     Canvas(modifier = Modifier.fillMaxSize()) {
         drawRect(
-            brush = Brush.linearGradient(
+            brush = Brush.sweepGradient(
                 colors = listOf(
-                    Color(0xFF0A0E17),
-                    Color(0xFF132238),
-                    Color(0xFF0D324D),
-                    Color(0xFF004D7A),
-                )
+                    Color(0xFF6A11CB),
+                    Color(0xFF2575FC),
+                    Color(0xFF00F2FE),
+                    Color(0xFF4FACFE),
+                    Color(0xFF6A11CB),
+                ),
+                center = Offset(size.width / 2f + sweepOffset * 0.1f, size.height / 2f)
             )
         )
     }

@@ -10,15 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beyondbday69.liquiddock.ui.playground.LiquidDockPlaygroundScreen
@@ -48,16 +49,21 @@ class MainActivity : ComponentActivity() {
                             .padding(24.dp)
                     ) {
                         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                            Text(
+                            BasicText(
                                 text = "Application Error",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = Color(0xFFFF5252)
+                                style = TextStyle(
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFFFF5252)
+                                )
                             )
-                            Text(
+                            BasicText(
                                 text = crashLog ?: "",
-                                color = Color.White,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily.Monospace,
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    fontFamily = FontFamily.Monospace
+                                ),
                                 modifier = Modifier.padding(top = 16.dp)
                             )
                         }

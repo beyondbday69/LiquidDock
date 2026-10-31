@@ -5,7 +5,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +22,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,16 +32,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -49,17 +41,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.beyondbday69.liquiddock.ui.components.GlassCard
+import com.beyondbday69.liquiddock.ui.components.GlassChip
+import com.beyondbday69.liquiddock.ui.components.GlassIcon
+import com.beyondbday69.liquiddock.ui.components.GlassIconButton
+import com.beyondbday69.liquiddock.ui.components.GlassText
+import com.beyondbday69.liquiddock.ui.components.LiquidSlider
 import com.beyondbday69.liquiddock.ui.components.LiquidToggle
-import com.beyondbday69.liquiddock.ui.dock.AllPlaygroundTabs
 import com.beyondbday69.liquiddock.ui.dock.BackgroundPreset
 import com.beyondbday69.liquiddock.ui.dock.DockConfig
 import com.beyondbday69.liquiddock.ui.dock.LiquidDockBar
 import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 
+/**
+ * Pure Authentic Liquid Glass Playground (100% Free of Material 3).
+ */
 @Composable
 fun LiquidDockPlaygroundScreen(
     backdrop: LayerBackdrop,
@@ -92,13 +94,20 @@ fun LiquidDockPlaygroundScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Surface(
-                shape = CircleShape,
-                color = if (config.isDarkTheme) Color.Black.copy(0.6f) else Color.White.copy(0.85f),
-                shadowElevation = 4.dp,
+            val headerBg = if (config.isDarkTheme) Color.Black.copy(0.60f) else Color.White.copy(0.85f)
+            val headerBorder = Color.White.copy(alpha = if (config.isDarkTheme) 0.20f else 0.50f)
+
+            // Status Pill
+            Box(
+                modifier = Modifier
+                    .shadow(4.dp, CircleShape)
+                    .clip(CircleShape)
+                    .background(headerBg)
+                    .border(BorderStroke(0.5.dp, headerBorder), CircleShape)
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
@@ -108,42 +117,47 @@ fun LiquidDockPlaygroundScreen(
                             .clip(CircleShape)
                             .background(if (config.liquidGlassEnabled) Color(0xFF00E676) else Color(0xFFFF9100))
                     )
-                    Text(
-                        text = if (config.liquidGlassEnabled) "Liquid Glass: ON" else "Standard M3: OFF",
-                        style = MaterialTheme.typography.labelMedium,
+                    GlassText(
+                        text = if (config.liquidGlassEnabled) "Liquid Glass: ACTIVE" else "Liquid Glass: OFF",
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (config.isDarkTheme) Color.White else Color.Black
                     )
                 }
             }
 
+            // Theme & Inspector Action Buttons
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Surface(
+                GlassIconButton(
+                    onClick = { config = config.copy(isDarkTheme = !config.isDarkTheme) },
                     shape = CircleShape,
-                    color = if (config.isDarkTheme) Color.Black.copy(0.6f) else Color.White.copy(0.85f),
-                    shadowElevation = 4.dp,
+                    containerColor = headerBg,
+                    modifier = Modifier
+                        .shadow(4.dp, CircleShape)
+                        .border(BorderStroke(0.5.dp, headerBorder), CircleShape)
                 ) {
-                    IconButton(onClick = { config = config.copy(isDarkTheme = !config.isDarkTheme) }) {
-                        Icon(
-                            imageVector = if (config.isDarkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
-                            contentDescription = "Toggle Theme",
-                            tint = if (config.isDarkTheme) Color.White else Color.Black
-                        )
-                    }
+                    GlassIcon(
+                        imageVector = if (config.isDarkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                        contentDescription = "Toggle Theme",
+                        tint = if (config.isDarkTheme) Color.White else Color.Black,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
 
-                Surface(
+                GlassIconButton(
+                    onClick = { showInspector = !showInspector },
                     shape = CircleShape,
-                    color = if (config.isDarkTheme) Color.Black.copy(0.6f) else Color.White.copy(0.85f),
-                    shadowElevation = 4.dp,
+                    containerColor = headerBg,
+                    modifier = Modifier
+                        .shadow(4.dp, CircleShape)
+                        .border(BorderStroke(0.5.dp, headerBorder), CircleShape)
                 ) {
-                    IconButton(onClick = { showInspector = !showInspector }) {
-                        Icon(
-                            imageVector = if (showInspector) Icons.Filled.Close else Icons.Filled.Tune,
-                            contentDescription = "Tune Inspector",
-                            tint = if (config.isDarkTheme) Color.White else Color.Black
-                        )
-                    }
+                    GlassIcon(
+                        imageVector = if (showInspector) Icons.Filled.Close else Icons.Filled.Tune,
+                        contentDescription = "Tune Inspector",
+                        tint = if (config.isDarkTheme) Color.White else Color.Black,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }
@@ -166,7 +180,7 @@ fun LiquidDockPlaygroundScreen(
             )
         }
 
-        // Floating Bottom DockBar
+        // Floating Bottom Liquid DockBar
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -197,13 +211,10 @@ private fun InspectorPanel(
     onConfigChange: (DockConfig) -> Unit,
     onClose: () -> Unit,
 ) {
-    Card(
+    GlassCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (config.isDarkTheme) Color(0xFF1E222B).copy(alpha = 0.96f) else Color.White.copy(alpha = 0.96f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        isDarkTheme = config.isDarkTheme,
     ) {
         Column(
             modifier = Modifier
@@ -216,17 +227,21 @@ private fun InspectorPanel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Dock Playground Inspector",
-                    style = MaterialTheme.typography.titleLarge,
+                GlassText(
+                    text = "Liquid Glass Inspector",
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (config.isDarkTheme) Color.White else Color.Black
                 )
-                IconButton(onClick = onClose) {
-                    Icon(
+                GlassIconButton(
+                    onClick = onClose,
+                    shape = CircleShape,
+                ) {
+                    GlassIcon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = "Close",
-                        tint = if (config.isDarkTheme) Color.White else Color.Black
+                        tint = if (config.isDarkTheme) Color.White else Color.Black,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -240,16 +255,17 @@ private fun InspectorPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text(
-                        text = "Liquid Glass Effect",
-                        style = MaterialTheme.typography.bodyLarge,
+                    GlassText(
+                        text = "Liquid Glass Shader",
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (config.isDarkTheme) Color.White else Color.Black
                     )
-                    Text(
-                        text = "Authentic Kyant refraction shader vs solid M3",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray
+                    GlassText(
+                        text = "Authentic Kyant chromatic lens refraction",
+                        fontSize = 12.sp,
+                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
                 LiquidToggle(
@@ -260,7 +276,7 @@ private fun InspectorPanel(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Liquid Glass Toggle 2: Chromatic Aberration
             Row(
@@ -269,16 +285,17 @@ private fun InspectorPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text(
+                    GlassText(
                         text = "Chromatic Dispersion",
-                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (config.isDarkTheme) Color.White else Color.Black
                     )
-                    Text(
-                        text = "Prismatic lens color fringe effect",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray
+                    GlassText(
+                        text = "Prismatic optical lens color fringe",
+                        fontSize = 12.sp,
+                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
                 LiquidToggle(
@@ -289,7 +306,7 @@ private fun InspectorPanel(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Liquid Glass Toggle 3: Cut Corner Morph
             Row(
@@ -298,16 +315,17 @@ private fun InspectorPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text(
+                    GlassText(
                         text = "Cut-Corner Morph",
-                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = if (config.isDarkTheme) Color.White else Color.Black
                     )
-                    Text(
-                        text = "Dynamic 16dp -> 24dp settings corner morph",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray
+                    GlassText(
+                        text = "Fluid 16dp -> 24dp settings corner morph",
+                        fontSize = 12.sp,
+                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray,
+                        modifier = Modifier.padding(top = 2.dp)
                     )
                 }
                 LiquidToggle(
@@ -318,73 +336,80 @@ private fun InspectorPanel(
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Background preset
-            Text(
+            GlassText(
                 text = "Backdrop Scenario",
-                style = MaterialTheme.typography.labelLarge,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (config.isDarkTheme) Color.White else Color.Black
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 BackgroundPreset.values().forEach { preset ->
-                    FilterChip(
+                    GlassChip(
                         selected = config.backgroundPreset == preset,
                         onClick = { onConfigChange(config.copy(backgroundPreset = preset)) },
-                        label = { Text(preset.displayName, style = MaterialTheme.typography.labelSmall) }
+                        label = preset.displayName,
+                        isDarkTheme = config.isDarkTheme
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Blur radius
-            SliderControl(
+            SliderSection(
                 title = "Blur Radius: ${config.blurRadiusDp.toInt()} dp",
                 value = config.blurRadiusDp,
                 range = 0f..32f,
-                isDark = config.isDarkTheme,
+                isDarkTheme = config.isDarkTheme,
                 onValueChange = { onConfigChange(config.copy(blurRadiusDp = it)) }
             )
 
             // Lens refraction
-            SliderControl(
+            SliderSection(
                 title = "Lens Height / Refraction: ${config.lensHeightDp.toInt()} dp",
                 value = config.lensHeightDp,
                 range = 0f..28f,
-                isDark = config.isDarkTheme,
+                isDarkTheme = config.isDarkTheme,
                 onValueChange = { onConfigChange(config.copy(lensHeightDp = it)) }
             )
 
             // Highlight alpha
-            SliderControl(
-                title = "Highlight Edge Specular: ${(config.highlightAlpha * 100).toInt()}%",
+            SliderSection(
+                title = "Specular Highlight: ${(config.highlightAlpha * 100).toInt()}%",
                 value = config.highlightAlpha,
                 range = 0f..1f,
-                isDark = config.isDarkTheme,
+                isDarkTheme = config.isDarkTheme,
                 onValueChange = { onConfigChange(config.copy(highlightAlpha = it)) }
             )
 
             // Number of tabs
-            Text(
+            Spacer(modifier = Modifier.height(6.dp))
+            GlassText(
                 text = "Tab Count: ${config.tabCount} tabs",
-                style = MaterialTheme.typography.labelLarge,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (config.isDarkTheme) Color.White else Color.Black
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 listOf(3, 4, 5).forEach { count ->
-                    FilterChip(
+                    GlassChip(
                         selected = config.tabCount == count,
                         onClick = { onConfigChange(config.copy(tabCount = count)) },
-                        label = { Text("$count Tabs") }
+                        label = "$count Tabs",
+                        isDarkTheme = config.isDarkTheme
                     )
                 }
             }
@@ -393,24 +418,26 @@ private fun InspectorPanel(
 }
 
 @Composable
-private fun SliderControl(
+private fun SliderSection(
     title: String,
     value: Float,
     range: ClosedFloatingPointRange<Float>,
-    isDark: Boolean,
+    isDarkTheme: Boolean,
     onValueChange: (Float) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Text(
+        GlassText(
             text = title,
-            style = MaterialTheme.typography.bodyMedium,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
-            color = if (isDark) Color.White else Color.Black
+            color = if (isDarkTheme) Color.White else Color.Black
         )
-        Slider(
+        LiquidSlider(
             value = value,
             onValueChange = onValueChange,
             valueRange = range,
+            isDarkTheme = isDarkTheme,
+            modifier = Modifier.padding(top = 4.dp)
         )
     }
 }

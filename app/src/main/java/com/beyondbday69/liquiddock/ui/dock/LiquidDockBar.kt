@@ -36,12 +36,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,9 +45,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.beyondbday69.liquiddock.ui.components.GlassIcon
+import com.beyondbday69.liquiddock.ui.components.GlassText
 import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.kyant.backdrop.drawBackdrop
 import com.kyant.backdrop.effects.blur
@@ -75,6 +74,10 @@ val AllPlaygroundTabs = listOf(
     PlaygroundTab("Stats", Icons.Filled.Analytics),
 )
 
+/**
+ * Pure Authentic Liquid Glass Dockbar (100% Free of Material 3).
+ * Refracts the underlying backdrop with chromatic aberration, blur, vibrancy, and specular highlights.
+ */
 @Composable
 fun LiquidDockBar(
     selectedIndex: Int,
@@ -111,7 +114,13 @@ fun LiquidDockBar(
             bottomEnd = 16.dp,
         )
 
-        val mainDockModifier = if (isGlass) {
+        val glassContainerColor = if (isDarkTheme) {
+            Color(0xFF141418).copy(alpha = 0.52f)
+        } else {
+            Color(0xFFFAFAFC).copy(alpha = 0.58f)
+        }
+
+        val mainDockModifier = if (isGlass && backdrop != null) {
             Modifier
                 .wrapContentWidth()
                 .height(config.dockHeightDp.dp)
@@ -121,37 +130,44 @@ fun LiquidDockBar(
                     effects = {
                         vibrancy()
                         blur(config.blurRadiusDp.dp.toPx())
-                        lens(config.lensHeightDp.dp.toPx(), config.lensAmountDp.dp.toPx(), chromaticAberration = config.chromaticAberration)
+                        lens(
+                            config.lensHeightDp.dp.toPx(),
+                            config.lensAmountDp.dp.toPx(),
+                            chromaticAberration = config.chromaticAberration
+                        )
                     },
                     highlight = { Highlight.Default.copy(alpha = config.highlightAlpha) },
                     shadow = {
                         Shadow(
                             radius = 16.dp,
-                            color = Color.Black.copy(alpha = if (isDarkTheme) 0.35f else 0.12f),
+                            color = Color.Black.copy(alpha = if (isDarkTheme) 0.38f else 0.12f),
                         )
                     },
                     innerShadow = {
                         InnerShadow(
                             radius = 8.dp,
-                            color = if (isDarkTheme) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.25f),
+                            color = if (isDarkTheme) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.28f),
                         )
                     },
                     onDrawSurface = {
-                        val glassSurfaceColor = if (isDarkTheme) {
-                            Color(0xFF141416).copy(alpha = 0.55f)
-                        } else {
-                            Color(0xFFFAFAFA).copy(alpha = 0.60f)
-                        }
-                        drawRect(glassSurfaceColor)
+                        drawRect(glassContainerColor)
                     },
                 )
                 .clip(mainDockShape)
+                .border(
+                    BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.60f)),
+                    mainDockShape
+                )
         } else {
             Modifier
                 .wrapContentWidth()
                 .height(config.dockHeightDp.dp)
                 .clip(mainDockShape)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .background(glassContainerColor)
+                .border(
+                    BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.60f)),
+                    mainDockShape
+                )
         }
 
         Box(modifier = mainDockModifier) {
@@ -203,22 +219,20 @@ fun LiquidDockBar(
             label = "settingsScale",
         )
 
-        val settingsUnselectedColor = if (isGlass) {
-            if (isDarkTheme) Color.White.copy(alpha = 0.85f) else Color(0xFF1F1F1F).copy(alpha = 0.80f)
+        val settingsUnselectedColor = if (isDarkTheme) {
+            Color.White.copy(alpha = 0.75f)
         } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
+            Color(0xFF1E1E22).copy(alpha = 0.75f)
         }
 
         val settingsContentColor by animateColorAsState(
-            targetValue = if (isSettingsSelected) MaterialTheme.colorScheme.onPrimaryContainer else settingsUnselectedColor,
+            targetValue = if (isSettingsSelected) {
+                if (isDarkTheme) Color.White else Color(0xFF0F1012)
+            } else {
+                settingsUnselectedColor
+            },
             animationSpec = spring(stiffness = 380f, dampingRatio = 0.8f),
             label = "settingsContentColor",
-        )
-
-        val settingsSurfaceColor by animateColorAsState(
-            targetValue = if (isSettingsSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
-            animationSpec = spring(stiffness = 380f, dampingRatio = 0.8f),
-            label = "settingsSurfaceColor",
         )
 
         val settingsCutCorner by animateDpAsState(
@@ -253,12 +267,12 @@ fun LiquidDockBar(
         )
 
         val glassSettingsTint = if (isSettingsSelected) {
-            MaterialTheme.colorScheme.primaryContainer.copy(alpha = config.selectedItemPillAlpha)
+            if (isDarkTheme) Color.White.copy(alpha = 0.26f) else Color.White.copy(alpha = 0.44f)
         } else {
-            if (isDarkTheme) Color(0xFF141416).copy(alpha = 0.55f) else Color(0xFFFAFAFA).copy(alpha = 0.60f)
+            if (isDarkTheme) Color(0xFF141418).copy(alpha = 0.52f) else Color(0xFFFAFAFC).copy(alpha = 0.58f)
         }
 
-        val settingsModifier = if (isGlass) {
+        val settingsModifier = if (isGlass && backdrop != null) {
             Modifier
                 .height(config.dockHeightDp.dp)
                 .width(settingsWidth)
@@ -268,19 +282,23 @@ fun LiquidDockBar(
                     effects = {
                         vibrancy()
                         blur(config.blurRadiusDp.dp.toPx())
-                        lens(config.lensHeightDp.dp.toPx(), config.lensAmountDp.dp.toPx(), chromaticAberration = config.chromaticAberration)
+                        lens(
+                            config.lensHeightDp.dp.toPx(),
+                            config.lensAmountDp.dp.toPx(),
+                            chromaticAberration = config.chromaticAberration
+                        )
                     },
                     highlight = { Highlight.Default.copy(alpha = config.highlightAlpha) },
                     shadow = {
                         Shadow(
                             radius = 16.dp,
-                            color = Color.Black.copy(alpha = if (isDarkTheme) 0.35f else 0.12f),
+                            color = Color.Black.copy(alpha = if (isDarkTheme) 0.38f else 0.12f),
                         )
                     },
                     innerShadow = {
                         InnerShadow(
                             radius = 8.dp,
-                            color = if (isDarkTheme) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.25f),
+                            color = if (isDarkTheme) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.28f),
                         )
                     },
                     onDrawSurface = {
@@ -288,22 +306,23 @@ fun LiquidDockBar(
                     },
                 )
                 .clip(settingsShape)
-                .then(
-                    if (isSettingsSelected) {
-                        Modifier.border(
-                            BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.30f else 0.50f)),
-                            settingsShape,
-                        )
-                    } else {
-                        Modifier
-                    }
+                .border(
+                    BorderStroke(
+                        0.5.dp,
+                        Color.White.copy(alpha = if (isSettingsSelected) 0.70f else if (isDarkTheme) 0.35f else 0.60f)
+                    ),
+                    settingsShape
                 )
         } else {
             Modifier
                 .height(config.dockHeightDp.dp)
                 .width(settingsWidth)
                 .clip(settingsShape)
-                .background(settingsSurfaceColor)
+                .background(glassSettingsTint)
+                .border(
+                    BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.60f)),
+                    settingsShape
+                )
         }
 
         Box(
@@ -324,19 +343,18 @@ fun LiquidDockBar(
                     ) { onSettingsClick() },
                 contentAlignment = Alignment.Center,
             ) {
-                CompositionLocalProvider(LocalContentColor provides settingsContentColor) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier
-                            .size(24.dp)
-                            .graphicsLayer {
-                                rotationZ = gearRotation
-                                scaleX = gearScale
-                                scaleY = gearScale
-                            },
-                    )
-                }
+                GlassIcon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Settings",
+                    tint = settingsContentColor,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .graphicsLayer {
+                            rotationZ = gearRotation
+                            scaleX = gearScale
+                            scaleY = gearScale
+                        },
+                )
             }
         }
     }
@@ -380,28 +398,22 @@ private fun LiquidDockItem(
         label = "dockItemScale",
     )
 
-    val unselectedContentColor = if (isGlass) {
-        if (isDarkTheme) Color.White.copy(alpha = 0.85f) else Color(0xFF1F1F1F).copy(alpha = 0.80f)
+    val unselectedContentColor = if (isDarkTheme) {
+        Color.White.copy(alpha = 0.75f)
     } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
+        Color(0xFF1E1E22).copy(alpha = 0.75f)
+    }
+
+    val selectedContentColor = if (isDarkTheme) {
+        Color.White
+    } else {
+        Color(0xFF0F1012)
     }
 
     val contentColor by animateColorAsState(
-        targetValue = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else unselectedContentColor,
+        targetValue = if (selected) selectedContentColor else unselectedContentColor,
         animationSpec = spring(stiffness = 380f, dampingRatio = 0.8f),
         label = "dockContentColor",
-    )
-
-    val pillColor = if (isGlass) {
-        MaterialTheme.colorScheme.primaryContainer.copy(alpha = selectedPillAlpha)
-    } else {
-        MaterialTheme.colorScheme.primaryContainer
-    }
-
-    val pillBackgroundColor by animateColorAsState(
-        targetValue = if (selected) pillColor else Color.Transparent,
-        animationSpec = spring(stiffness = 380f, dampingRatio = 0.8f),
-        label = "dockPillBackgroundColor",
     )
 
     val itemWidth by animateDpAsState(
@@ -411,9 +423,14 @@ private fun LiquidDockItem(
     )
 
     val itemShape = CircleShape
-    val primaryContainerColor = MaterialTheme.colorScheme.primaryContainer
 
-    // Selected item is an authentic Liquid Glass lens!
+    // Selected tab surface is an authentic Apple Liquid Glass optical lens!
+    val activePillSurfaceColor = if (isDarkTheme) {
+        Color.White.copy(alpha = selectedPillAlpha.coerceIn(0.18f, 0.35f))
+    } else {
+        Color.White.copy(alpha = (selectedPillAlpha + 0.15f).coerceIn(0.30f, 0.55f))
+    }
+
     val itemBaseModifier = if (isGlass && backdrop != null && selected) {
         Modifier
             .height(44.dp)
@@ -430,12 +447,12 @@ private fun LiquidDockItem(
                 shadow = { Shadow(radius = 8.dp, color = Color.Black.copy(alpha = 0.25f)) },
                 innerShadow = { InnerShadow(radius = 4.dp, color = Color.White.copy(alpha = 0.45f)) },
                 onDrawSurface = {
-                    drawRect(primaryContainerColor.copy(alpha = selectedPillAlpha))
+                    drawRect(activePillSurfaceColor)
                 }
             )
             .clip(itemShape)
             .border(
-                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.50f else 0.70f)),
+                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.60f else 0.80f)),
                 itemShape
             )
     } else if (isGlass && isHovered && !selected) {
@@ -443,29 +460,26 @@ private fun LiquidDockItem(
             .height(44.dp)
             .width(itemWidth)
             .clip(itemShape)
-            .background(Color.White.copy(alpha = if (isDarkTheme) 0.12f else 0.20f))
+            .background(Color.White.copy(alpha = if (isDarkTheme) 0.14f else 0.22f))
             .border(
-                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.30f else 0.45f)),
+                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.50f)),
                 itemShape
             )
-    } else {
-        val itemBorder = if (isGlass && selected) {
-            BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.50f))
-        } else {
-            null
-        }
+    } else if (selected) {
         Modifier
             .height(44.dp)
             .width(itemWidth)
             .clip(itemShape)
-            .background(pillBackgroundColor)
-            .then(
-                if (itemBorder != null) {
-                    Modifier.border(itemBorder, itemShape)
-                } else {
-                    Modifier
-                }
+            .background(activePillSurfaceColor)
+            .border(
+                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.50f else 0.70f)),
+                itemShape
             )
+    } else {
+        Modifier
+            .height(44.dp)
+            .width(itemWidth)
+            .clip(itemShape)
     }
 
     Box(
@@ -487,13 +501,12 @@ private fun LiquidDockItem(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxHeight().padding(horizontal = 8.dp),
         ) {
-            CompositionLocalProvider(LocalContentColor provides contentColor) {
-                Icon(
-                    imageVector = tab.icon,
-                    contentDescription = tab.title,
-                    modifier = Modifier.size(24.dp),
-                )
-            }
+            GlassIcon(
+                imageVector = tab.icon,
+                contentDescription = tab.title,
+                tint = contentColor,
+                modifier = Modifier.size(24.dp),
+            )
             AnimatedVisibility(
                 visible = selected,
                 enter = fadeIn(animationSpec = spring(stiffness = 380f, dampingRatio = 0.8f)) +
@@ -509,10 +522,11 @@ private fun LiquidDockItem(
                             clip = true,
                         ),
             ) {
-                Text(
+                GlassText(
                     text = tab.title,
-                    style = MaterialTheme.typography.labelMedium,
                     color = contentColor,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     softWrap = false,
