@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.beyondbday69.liquiddock.ui.components.LiquidToggle
 import com.beyondbday69.liquiddock.ui.dock.AllPlaygroundTabs
 import com.beyondbday69.liquiddock.ui.dock.BackgroundPreset
 import com.beyondbday69.liquiddock.ui.dock.DockConfig
@@ -78,6 +79,7 @@ fun LiquidDockPlaygroundScreen(
         ) {
             BackgroundCanvas(
                 config = config,
+                backdrop = backdrop,
                 contentPadding = PaddingValues(top = 80.dp, bottom = 120.dp),
             )
         }
@@ -159,6 +161,7 @@ fun LiquidDockPlaygroundScreen(
         ) {
             InspectorPanel(
                 config = config,
+                backdrop = backdrop,
                 onConfigChange = { config = it },
                 onClose = { showInspector = false },
             )
@@ -191,6 +194,7 @@ fun LiquidDockPlaygroundScreen(
 @Composable
 private fun InspectorPanel(
     config: DockConfig,
+    backdrop: LayerBackdrop,
     onConfigChange: (DockConfig) -> Unit,
     onClose: () -> Unit,
 ) {
@@ -228,30 +232,90 @@ private fun InspectorPanel(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Liquid Glass Toggle
+            // Liquid Glass Toggle 1: Enable Liquid Glass
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
-                        text = "Enable Liquid Glass Effect",
+                        text = "Liquid Glass Effect",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         color = if (config.isDarkTheme) Color.White else Color.Black
                     )
                     Text(
-                        text = "Toggle between authentic Kyant shader and solid M3",
+                        text = "Authentic Kyant refraction shader vs solid M3",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray
                     )
                 }
-                Switch(
-                    checked = config.liquidGlassEnabled,
-                    onCheckedChange = { onConfigChange(config.copy(liquidGlassEnabled = it)) }
+                LiquidToggle(
+                    selected = { config.liquidGlassEnabled },
+                    onSelect = { onConfigChange(config.copy(liquidGlassEnabled = it)) },
+                    backdrop = backdrop,
+                    accentColor = Color(0xFF34C759)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Liquid Glass Toggle 2: Chromatic Aberration
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text(
+                        text = "Chromatic Dispersion",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (config.isDarkTheme) Color.White else Color.Black
+                    )
+                    Text(
+                        text = "Prismatic lens color fringe effect",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray
+                    )
+                }
+                LiquidToggle(
+                    selected = { config.chromaticAberration },
+                    onSelect = { onConfigChange(config.copy(chromaticAberration = it)) },
+                    backdrop = backdrop,
+                    accentColor = Color(0xFF00A3FF)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Liquid Glass Toggle 3: Cut Corner Morph
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text(
+                        text = "Cut-Corner Morph",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (config.isDarkTheme) Color.White else Color.Black
+                    )
+                    Text(
+                        text = "Dynamic 16dp -> 24dp settings corner morph",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (config.isDarkTheme) Color.White.copy(0.6f) else Color.Gray
+                    )
+                }
+                LiquidToggle(
+                    selected = { config.showCutCornerMorph },
+                    onSelect = { onConfigChange(config.copy(showCutCornerMorph = it)) },
+                    backdrop = backdrop,
+                    accentColor = Color(0xFFAF52DE)
                 )
             }
 

@@ -19,4 +19,6 @@ data class DockConfig(
     val tabCount: Int = 4, // 3, 4, or 5 tabs
     val selectedItemPillAlpha: Float = 0.72f,
     val showCutCornerMorph: Boolean = true,
+    val chromaticAberration: Boolean = true,
+    val specularGlow: Boolean = true,
 )

@@ -119,7 +119,7 @@ fun LiquidDockBar(
                     effects = {
                         vibrancy()
                         blur(config.blurRadiusDp.dp.toPx())
-                        lens(config.lensHeightDp.dp.toPx(), config.lensAmountDp.dp.toPx())
+                        lens(config.lensHeightDp.dp.toPx(), config.lensAmountDp.dp.toPx(), chromaticAberration = config.chromaticAberration)
                     },
                     highlight = { Highlight.Default.copy(alpha = config.highlightAlpha) },
                     shadow = {
@@ -248,7 +248,7 @@ fun LiquidDockBar(
                     effects = {
                         vibrancy()
                         blur(config.blurRadiusDp.dp.toPx())
-                        lens(config.lensHeightDp.dp.toPx(), config.lensAmountDp.dp.toPx())
+                        lens(config.lensHeightDp.dp.toPx(), config.lensAmountDp.dp.toPx(), chromaticAberration = config.chromaticAberration)
                     },
                     highlight = { Highlight.Default.copy(alpha = config.highlightAlpha) },
                     shadow = {
