@@ -34,9 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,10 +42,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.beyondbday69.liquiddock.ui.components.LiquidToggle
 import com.beyondbday69.liquiddock.ui.dock.BackgroundPreset
 import com.beyondbday69.liquiddock.ui.dock.DockConfig
-import com.kyant.backdrop.Backdrop
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -79,14 +74,9 @@ val SampleCards = listOf(
 @Composable
 fun BackgroundCanvas(
     config: DockConfig,
-    backdrop: Backdrop,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    var showcaseToggle1 by remember { mutableStateOf(true) }
-    var showcaseToggle2 by remember { mutableStateOf(false) }
-    var showcaseToggle3 by remember { mutableStateOf(true) }
-
     Box(modifier = modifier.fillMaxSize()) {
         when (config.backgroundPreset) {
             BackgroundPreset.MESH_GRADIENT -> AnimatedMeshGradient()
@@ -122,99 +112,6 @@ fun BackgroundCanvas(
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (config.isDarkTheme) Color.White.copy(0.70f) else Color(0xFF44474E)
                     )
-                }
-            }
-
-            // Interactive Kyant Liquid Toggles Card
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (config.isDarkTheme) Color(0xFF181B22).copy(alpha = 0.90f) else Color.White.copy(alpha = 0.92f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        Text(
-                            text = "Kyant Liquid Toggles",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (config.isDarkTheme) Color.White else Color.Black
-                        )
-                        Text(
-                            text = "Interactive squishy switches with velocity deformation and chromatic dispersion.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (config.isDarkTheme) Color.White.copy(0.65f) else Color.Gray
-                        )
-
-                        // Toggle 1
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Liquid Glass Shader",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = if (config.isDarkTheme) Color.White else Color.Black
-                            )
-                            LiquidToggle(
-                                selected = { showcaseToggle1 },
-                                onSelect = { showcaseToggle1 = it },
-                                backdrop = backdrop,
-                                accentColor = Color(0xFF34C759)
-                            )
-                        }
-
-                        // Toggle 2
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Chromatic Aberration",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = if (config.isDarkTheme) Color.White else Color.Black
-                            )
-                            LiquidToggle(
-                                selected = { showcaseToggle2 },
-                                onSelect = { showcaseToggle2 = it },
-                                backdrop = backdrop,
-                                accentColor = Color(0xFF007AFF)
-                            )
-                        }
-
-                        // Toggle 3
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Elastic Squish Physics",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium,
-                                color = if (config.isDarkTheme) Color.White else Color.Black
-                            )
-                            LiquidToggle(
-                                selected = { showcaseToggle3 },
-                                onSelect = { showcaseToggle3 = it },
-                                backdrop = backdrop,
-                                accentColor = Color(0xFFFF9500)
-                            )
-                        }
-                    }
                 }
             }
 
@@ -292,7 +189,7 @@ fun BackgroundCanvas(
             }
 
             item {
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(110.dp))
             }
         }
     }
@@ -315,7 +212,6 @@ private fun AnimatedMeshGradient() {
         val w = size.width
         val h = size.height
 
-        // Rich animated gradient orbs
         val x1 = w * (0.3f + 0.2f * sin(phase))
         val y1 = h * (0.3f + 0.2f * cos(phase))
         val x2 = w * (0.7f + 0.2f * cos(phase * 0.8f))

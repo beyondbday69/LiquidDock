@@ -254,7 +254,7 @@ private fun InspectorPanel(
                     )
                 }
                 LiquidToggle(
-                    selected = { config.liquidGlassEnabled },
+                    selected = config.liquidGlassEnabled,
                     onSelect = { onConfigChange(config.copy(liquidGlassEnabled = it)) },
                     backdrop = backdrop,
                     accentColor = Color(0xFF34C759)
@@ -283,7 +283,7 @@ private fun InspectorPanel(
                     )
                 }
                 LiquidToggle(
-                    selected = { config.chromaticAberration },
+                    selected = config.chromaticAberration,
                     onSelect = { onConfigChange(config.copy(chromaticAberration = it)) },
                     backdrop = backdrop,
                     accentColor = Color(0xFF00A3FF)
@@ -312,7 +312,7 @@ private fun InspectorPanel(
                     )
                 }
                 LiquidToggle(
-                    selected = { config.showCutCornerMorph },
+                    selected = config.showCutCornerMorph,
                     onSelect = { onConfigChange(config.copy(showCutCornerMorph = it)) },
                     backdrop = backdrop,
                     accentColor = Color(0xFFAF52DE)

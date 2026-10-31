@@ -83,7 +83,7 @@ fun LiquidDockBar(
     config: DockConfig,
     modifier: Modifier = Modifier,
 ) {
-    val isGlass = config.liquidGlassEnabled && backdrop != null
+    val isGlass = config.liquidGlassEnabled && backdrop != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
     val isDarkTheme = config.isDarkTheme
 
     val activeTabs = remember(config.tabCount) {
