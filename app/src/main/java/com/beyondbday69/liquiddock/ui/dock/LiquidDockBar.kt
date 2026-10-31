@@ -13,7 +13,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -164,6 +166,7 @@ fun LiquidDockBar(
                         tab = tab,
                         selected = isSelected,
                         selectedWidth = selectedItemWidth,
+                        backdrop = backdrop,
                         isGlass = isGlass,
                         isDarkTheme = isDarkTheme,
                         selectedPillAlpha = config.selectedItemPillAlpha,
@@ -176,11 +179,28 @@ fun LiquidDockBar(
         // --- 2. Settings Button Pill (Right) ---
         val settingsInteractionSource = remember { MutableInteractionSource() }
         val isSettingsPressed by settingsInteractionSource.collectIsPressedAsState()
+        val isSettingsHovered by settingsInteractionSource.collectIsHoveredAsState()
 
-        val settingsPressScale by animateFloatAsState(
-            targetValue = if (isSettingsPressed) 0.90f else 1.0f,
-            animationSpec = spring(stiffness = 800f, dampingRatio = 0.6f),
-            label = "settingsPressScale",
+        val settingsLiftY by animateDpAsState(
+            targetValue = when {
+                isSettingsPressed -> (-2).dp
+                isSettingsHovered -> (-6).dp
+                isSettingsSelected -> (-2).dp
+                else -> 0.dp
+            },
+            animationSpec = spring(stiffness = 500f, dampingRatio = 0.7f),
+            label = "settingsLiftY",
+        )
+
+        val settingsScale by animateFloatAsState(
+            targetValue = when {
+                isSettingsPressed -> 0.94f
+                isSettingsHovered -> 1.08f
+                isSettingsSelected -> 1.03f
+                else -> 1.0f
+            },
+            animationSpec = spring(stiffness = 600f, dampingRatio = 0.65f),
+            label = "settingsScale",
         )
 
         val settingsUnselectedColor = if (isGlass) {
@@ -286,14 +306,18 @@ fun LiquidDockBar(
                 .background(settingsSurfaceColor)
         }
 
-        Box(modifier = settingsModifier) {
+        Box(
+            modifier = settingsModifier
+                .hoverable(interactionSource = settingsInteractionSource)
+                .graphicsLayer {
+                    translationY = settingsLiftY.toPx()
+                    scaleX = settingsScale
+                    scaleY = settingsScale
+                }
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer {
-                        scaleX = settingsPressScale
-                        scaleY = settingsPressScale
-                    }
                     .clickable(
                         interactionSource = settingsInteractionSource,
                         indication = null,
@@ -323,6 +347,7 @@ private fun LiquidDockItem(
     tab: PlaygroundTab,
     selected: Boolean,
     selectedWidth: Dp,
+    backdrop: LayerBackdrop?,
     isGlass: Boolean,
     isDarkTheme: Boolean,
     selectedPillAlpha: Float,
@@ -330,11 +355,29 @@ private fun LiquidDockItem(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    val isHovered by interactionSource.collectIsHoveredAsState()
 
-    val pressScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else 1.0f,
-        animationSpec = spring(stiffness = 800f, dampingRatio = 0.6f),
-        label = "dockPressScale",
+    // Hover lift & elevation: lifts up smoothly (-6dp) on hover or select
+    val liftY by animateDpAsState(
+        targetValue = when {
+            isPressed -> (-2).dp
+            isHovered -> (-6).dp
+            selected -> (-2).dp
+            else -> 0.dp
+        },
+        animationSpec = spring(stiffness = 500f, dampingRatio = 0.7f),
+        label = "dockItemLiftY",
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = when {
+            isPressed -> 0.94f
+            isHovered -> 1.08f
+            selected -> 1.03f
+            else -> 1.0f
+        },
+        animationSpec = spring(stiffness = 600f, dampingRatio = 0.65f),
+        label = "dockItemScale",
     )
 
     val unselectedContentColor = if (isGlass) {
@@ -361,34 +404,76 @@ private fun LiquidDockItem(
         label = "dockPillBackgroundColor",
     )
 
-    val itemBorder = if (isGlass && selected) {
-        BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.50f))
-    } else {
-        null
-    }
-
     val itemWidth by animateDpAsState(
         targetValue = if (selected) selectedWidth else 44.dp,
         animationSpec = spring(stiffness = 380f, dampingRatio = 0.8f),
         label = "dockItemWidth",
     )
 
-    Box(
-        modifier = Modifier
+    val itemShape = CircleShape
+
+    // Selected item is an authentic Liquid Glass lens!
+    val itemBaseModifier = if (isGlass && backdrop != null && selected) {
+        Modifier
             .height(44.dp)
             .width(itemWidth)
-            .clip(CircleShape)
+            .drawBackdrop(
+                backdrop = backdrop,
+                shape = { itemShape },
+                effects = {
+                    vibrancy()
+                    blur(8.dp.toPx())
+                    lens(10.dp.toPx(), 16.dp.toPx(), chromaticAberration = true)
+                },
+                highlight = { Highlight.Default.copy(alpha = 0.85f) },
+                shadow = { Shadow(radius = 8.dp, color = Color.Black.copy(alpha = 0.25f)) },
+                innerShadow = { InnerShadow(radius = 4.dp, color = Color.White.copy(alpha = 0.45f)) },
+                onDrawSurface = {
+                    drawRect(MaterialTheme.colorScheme.primaryContainer.copy(alpha = selectedPillAlpha))
+                }
+            )
+            .clip(itemShape)
+            .border(
+                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.50f else 0.70f)),
+                itemShape
+            )
+    } else if (isGlass && isHovered && !selected) {
+        Modifier
+            .height(44.dp)
+            .width(itemWidth)
+            .clip(itemShape)
+            .background(Color.White.copy(alpha = if (isDarkTheme) 0.12f else 0.20f))
+            .border(
+                BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.30f else 0.45f)),
+                itemShape
+            )
+    } else {
+        val itemBorder = if (isGlass && selected) {
+            BorderStroke(0.5.dp, Color.White.copy(alpha = if (isDarkTheme) 0.35f else 0.50f))
+        } else {
+            null
+        }
+        Modifier
+            .height(44.dp)
+            .width(itemWidth)
+            .clip(itemShape)
             .background(pillBackgroundColor)
             .then(
                 if (itemBorder != null) {
-                    Modifier.border(itemBorder, CircleShape)
+                    Modifier.border(itemBorder, itemShape)
                 } else {
                     Modifier
                 }
             )
+    }
+
+    Box(
+        modifier = itemBaseModifier
+            .hoverable(interactionSource = interactionSource)
             .graphicsLayer {
-                scaleX = pressScale
-                scaleY = pressScale
+                translationY = liftY.toPx()
+                scaleX = scale
+                scaleY = scale
             }
             .clickable(
                 interactionSource = interactionSource,
