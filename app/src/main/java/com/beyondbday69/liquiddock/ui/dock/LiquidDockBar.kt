@@ -411,6 +411,7 @@ private fun LiquidDockItem(
     )
 
     val itemShape = CircleShape
+    val primaryContainerColor = MaterialTheme.colorScheme.primaryContainer
 
     // Selected item is an authentic Liquid Glass lens!
     val itemBaseModifier = if (isGlass && backdrop != null && selected) {
@@ -429,7 +430,7 @@ private fun LiquidDockItem(
                 shadow = { Shadow(radius = 8.dp, color = Color.Black.copy(alpha = 0.25f)) },
                 innerShadow = { InnerShadow(radius = 4.dp, color = Color.White.copy(alpha = 0.45f)) },
                 onDrawSurface = {
-                    drawRect(MaterialTheme.colorScheme.primaryContainer.copy(alpha = selectedPillAlpha))
+                    drawRect(primaryContainerColor.copy(alpha = selectedPillAlpha))
                 }
             )
             .clip(itemShape)
